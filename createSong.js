@@ -104,7 +104,7 @@ async function createSongs() {
   await copyImages(); // 📌 Copier les images avant d'ajouter les chansons
 
   for (const songData of songsData) {
-    const imageUrl = `https://nodeproject-production-15c0.up.railway.app/${songData.imageFile}`;
+    const imageUrl = `https://nodeproject-production-15c0.up.railway.app/uploads/${songData.imageFile}`;
 
     const newSong = await prisma.song.create({
       data: {
