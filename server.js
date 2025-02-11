@@ -1,6 +1,7 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const cors = require('cors');
+const path = require('path');
 const { createSong } = require('./createSong'); // Importation du fichier createSong.js
 const app = express();
 const prisma = new PrismaClient();
@@ -8,6 +9,9 @@ const prisma = new PrismaClient();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// 📌 Rendre les fichiers du dossier "uploads" accessibles publiquement
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API pour récupérer toutes les chansons
 app.get('/songs', async (req, res) => {

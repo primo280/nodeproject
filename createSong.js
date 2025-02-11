@@ -2,6 +2,18 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+const fs = require('fs');
+const path = require('path');
+
+// 📌 Dossier où seront stockées les images
+const uploadDir = path.join(__dirname, 'uploads');
+
+
+// 📌 Vérifier si le dossier "uploads" existe, sinon le créer
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
 const songsData = [
   { 
     songId: "1",
@@ -10,7 +22,7 @@ const songsData = [
     duration: 3.22,
     releaseDate: new Date('2020-11-29'),   
     videoUrl: 'https://www.youtube.com/watch?v=4NRXx6U8ABQ',
-    imageUrl: 'https://images.hdqwalls.com/download/the-weeknd-blinding-lights-sy-2880x1800.jpg',
+    imageFile: '1.jpg',
   },
   {
     songId: "2",
@@ -19,7 +31,7 @@ const songsData = [
     duration: 3.24,
     releaseDate: new Date('2020-10-01'),
     videoUrl: 'https://www.youtube.com/watch?v=TUVcZfQe-Kw',
-    imageUrl: 'https://www.pngall.com/wp-content/uploads/5/Dua-Lipa-PNG.png',
+    imageFile: '2.png',
   },
   {
     songId: "3",
@@ -28,7 +40,7 @@ const songsData = [
     duration: 3.53,
     releaseDate: new Date('2017-01-06'),
     videoUrl: 'https://www.youtube.com/watch?v=JGwWNGJdvx8',
-    imageUrl: 'https://www.radioandmusic.com/sites/www.radioandmusic.com/files/images/entertainment/2017/05/05/shape-you.jpg',
+    imageFile: '3.jpg',
   },
   {
     songId: "4",
@@ -37,7 +49,7 @@ const songsData = [
     duration: 3.18,
     releaseDate: new Date('2021-03-19'),
     videoUrl: 'https://www.youtube.com/watch?v=tQ0yjYUFKAE',
-    imageUrl: 'https://headlineplanet.com/home/wp-content/uploads/2021/04/Justin-Bieber-Peaches.jpg',
+    imageFile: '4.jpg',
   },
   {
     songId: "5",
@@ -46,7 +58,7 @@ const songsData = [
     duration: 3.35,
     releaseDate: new Date('2020-08-07'),
     videoUrl: 'https://www.youtube.com/watch?v=XXYlFuWEuKI',
-    imageUrl: 'https://themediaalert.com/wp-content/uploads/2021/01/The-Weeknd-Save-Your-Tears-1170x878.jpg',
+    imageFile: '5.jpg',
   },
   {
     songId: "6",
@@ -55,7 +67,7 @@ const songsData = [
     duration: 3.29,
     releaseDate: new Date('2021-04-09'),
     videoUrl: 'https://www.youtube.com/watch?v=0EVVKs6DQLo',
-    imageUrl: 'https://latexin.ru/images/news/latex-kitty-doja-cat.jpg',
+    imageFile: '6.jpg',
   },
   {
     songId: "7",
@@ -64,48 +76,57 @@ const songsData = [
     duration: 2.58,
     releaseDate: new Date('2021-05-14'),
     videoUrl: 'https://www.youtube.com/watch?v=gNi_6U5Pm_o',
-    imageUrl: 'https://i.pinimg.com/originals/a4/d0/71/a4d071c5741035b646259d9fecce253e.jpg',
+    imageFile: '7.jpg',
   },
-  {
-    songId: "8",
-    title: 'Montero (Call Me By Your Name)',
-    artist: 'Lil Nas X',
-    duration: 2.17,
-    releaseDate: new Date('2021-03-26'),
-    videoUrl: 'https://www.youtube.com/watch?v=6swmTBVI83k',
-    imageUrl: 'https://www.nme.com/wp-content/uploads/2024/01/Lil-Nas-X-J-Christ-single-cover.-Credit-PRESS.jpg',
-  },
-  {
-    songId: "9",
-    title: 'Stay',
-    artist: 'Kid LAROI & Justin Bieber',
-    duration: 2.21,
-    releaseDate: new Date('2021-07-09'),
-    videoUrl: 'https://www.youtube.com/watch?v=kTJczUoc26U',
-    imageUrl: 'https://i.pinimg.com/736x/cc/bf/f7/ccbff7bba941f460a85cb5239fcfdb11.jpg',
-  },
-  {
-    songId: "10",
-    title: 'Industry Baby',
-    artist: 'Lil Nas X & Jack Harlow',
-    duration: 3.32,
-    releaseDate: new Date('2021-07-23'),
-    videoUrl: 'https://www.youtube.com/watch?v=UTHLKHL_whs',
-    imageUrl: 'https://pics.filmaffinity.com/Lil_Nas_X_Jack_Harlow_Industry_Baby_Vaideo_musical-925296335-large.jpg',
-  },
+  
 ];
 
-// Créer plusieurs chansons dans la base de données
-async function createSong() {
-  for (const songData of songsData) {
-    const newSong = await prisma.song.create({
-      data: songData,
-    });
-    console.log(`Chanson créée: ${newSong.title} par ${newSong.artist}`);
+
+
+// 📌 Fonction pour copier les images locales dans le dossier uploads
+async function copyImages() {
+  for (const song of songsData) {
+    const sourcePath = path.join(__dirname, 'images', song.imageFile); // 📌 Dossier contenant les images
+    const destPath = path.join(uploadDir, song.imageFile);
+
+    if (fs.existsSync(sourcePath)) {
+      fs.copyFileSync(sourcePath, destPath);
+      console.log(`✅ Image copiée: ${song.imageFile}`);
+    } else {
+      console.log(`❌ Image non trouvée: ${song.imageFile}`);
+    }
   }
 }
 
-// Appel de la fonction pour créer les chansons
-createSong();
 
-module.exports = { createSong };
+// 📌 Fonction pour ajouter les chansons à la BDD avec les images locales
+async function createSongs() {
+  await copyImages(); // 📌 Copier les images avant d'ajouter les chansons
+
+  for (const songData of songsData) {
+    const imageUrl = `/uploads/${songData.imageFile}`;
+
+    const newSong = await prisma.song.create({
+      data: {
+        songId: songData.songId,
+        title: songData.title,
+        artist: songData.artist,
+        duration: songData.duration,
+        releaseDate: songData.releaseDate,
+        videoUrl: songData.videoUrl,
+        imageUrl: imageUrl // 📌 Stocker l'URL locale de l'image
+      }
+    });
+
+    console.log(`🎵 Chanson ajoutée: ${newSong.title} - ${newSong.artist}`);
+  }
+}
+
+// 📌 Exécuter la fonction
+createSongs()
+  .catch((error) => console.error("🚨 Erreur:", error))
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
+
+module.exports = { createSongs };
