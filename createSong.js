@@ -91,7 +91,7 @@ async function copyImages() {
 
     if (fs.existsSync(sourcePath)) {
       fs.copyFileSync(sourcePath, destPath);
-      console.log(`✅ Image copiée: ${song.imageFile}`);
+      console.log(`✅ Image copiée: ${song.imageFile} - ${song['imageUrl']}`);
     } else {
       console.log(`❌ Image non trouvée: ${song.imageFile}`);
     }
@@ -104,7 +104,7 @@ async function createSongs() {
   await copyImages(); // 📌 Copier les images avant d'ajouter les chansons
 
   for (const songData of songsData) {
-    const imageUrl = `/uploads/${songData.imageFile}`;
+    const imageUrl = `https://nodeproject-production-15c0.up.railway.app/${songData.imageFile}`;
 
     const newSong = await prisma.song.create({
       data: {
