@@ -91,7 +91,7 @@ async function copyImages() {
 
     if (fs.existsSync(sourcePath)) {
       fs.copyFileSync(sourcePath, destPath);
-      console.log(`✅ Image copiée: ${song.imageFile} - ${song['imageUrl']}`);
+      console.log(`✅ Image copiée: ${song.imageFile} `);
     } else {
       console.log(`❌ Image non trouvée: ${song.imageFile}`);
     }
@@ -118,7 +118,7 @@ async function createSongs() {
       }
     });
 
-    console.log(`🎵 Chanson ajoutée: ${newSong.title} - ${newSong.artist}`);
+    console.log(`🎵 Chanson ajoutée: ${newSong.title} - ${newSong.artist}- ${newsong['imageUrl']}`);
   }
 }
 
