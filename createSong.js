@@ -118,7 +118,7 @@ async function createSongs() {
       }
     });
 
-    console.log(`🎵 Chanson ajoutée: ${newSong.title} - ${newSong.artist}- ${newsong.imageUrl}`);
+    console.log(`🎵 Chanson ajoutée: ${newSong.title} - ${newSong.imageUrl}`);
   }
 }
 
